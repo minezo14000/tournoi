@@ -190,20 +190,31 @@
 
 </head>
 <body>
-  <h1>Tournoi FC 26 – PS5 – Ultimate Team</h1>
-  <p class="muted">
-    Outil local (offline). Coller 32 pseudos, tirer au sort, saisir les scores, classement auto.
-    Règle stricte possible : déconnexion = défaite (tu l’appliques en mettant 0-3 par ex).
-  </p>
+<div class="top">
+  <div>
+    <h1>Tournoi FC 26 – PS5 – Ultimate Team</h1>
+    <p class="muted">Coller 32 pseudos, tirage au sort, saisir les scores, classement automatique.</p>
+    <div class="metaLine">
+      <span class="badge"><span class="dot"></span> Live ready</span>
+      <span class="badge">32 joueurs max</span>
+      <span class="badge">Déco = défaite</span>
+      <span class="badge">Micro OFF</span>
+    </div>
+  </div>
+  <div class="pill">GitHub Pages</div>
+</div>
 
-  <div class="row">
-    <div class="card">
+
+<div class="grid">
+<div class="card">
       <h2>1) Joueurs (32 max)</h2>
       <textarea id="players" placeholder="Un pseudo par ligne (32 max)"></textarea>
-      <div class="row">
-        <button id="btnLoadExample">Charger exemple</button>
-        <button id="btnShuffle">Tirage au sort</button>
-        <button id="btnMakeMatches">Créer matchs (1er tour)</button>
+      <div class="btnRow">
+<button id="btnLoadExample" class="ghost">Charger exemple</button>
+<button id="btnShuffle" class="primary">Tirage au sort</button>
+<button id="btnMakeMatches" class="teal">Créer matchs (1er tour)</button>
+
+    
       </div>
       <p id="count" class="muted"></p>
       <p id="warn" class="danger"></p>
@@ -212,7 +223,8 @@
     <div class="card">
       <h2>2) Matchs – 1er tour</h2>
       <div id="matches"></div>
-      <button id="btnRecalc">Recalculer classement</button>
+      <button id="btnRecalc" class="ghost">Recalculer classement</button>
+
       <p class="muted">Points: victoire 3, nul 1, défaite 0 (modifiable dans le code).</p>
     </div>
   </div>
@@ -387,5 +399,8 @@
   state.players = parsePlayers();
   computeTable();
 </script>
+  </div>
 </body>
+  <div class="wrap">
+
 </html>
