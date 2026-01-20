@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tournoi FC 26 – Gestion</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:20px;max-width:1100px}
+    textarea,input,button{font-size:14px}
+    textarea{width:100%;height:140px}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .card{border:1px solid #ddd;border-radius:12px;padding:14px;flex:1;min-width:320px}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
+    th{background:#fafafa}
+    .muted{color:#666;font-size:13px}
+    .danger{color:#b00020;font-weight:600}
+  </style>
+</head>
+<body>
+  <h1>Tournoi FC 26 – PS5 – Ultimate Team</h1>
+  <p class="muted">
+    Outil local (offline). Coller 32 pseudos, tirer au sort, saisir les scores, classement auto.
+    Règle stricte possible : déconnexion = défaite (tu l’appliques en mettant 0-3 par ex).
+  </p>
+
+  <div class="row">
+    <div class="card">
+      <h2>1) Joueurs (32 max)</h2>
+      <textarea id="players" placeholder="Un pseudo par ligne (32 max)"></textarea>
+      <div class="row">
+        <button id="btnLoadExample">Charger exemple</button>
+        <button id="btnShuffle">Tirage au sort</button>
+        <button id="btnMakeMatches">Créer matchs (1er tour)</button>
+      </div>
+      <p id="count" class="muted"></p>
+      <p id="warn" class="danger"></p>
+    </div>
+
+    <div class="card">
+      <h2>2) Matchs – 1er tour</h2>
+      <div id="matches"></div>
+      <button id="btnRecalc">Recalculer classement</button>
+      <p class="muted">Points: victoire 3, nul 1, défaite 0 (modifiable dans le code).</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>3) Classement (live)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Joueur</th><th>J</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function parsePlayers() {
+    const lines = $("players").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const uniq = [];
+    const seen = new Set();
+    for (const p of lines) {
+      const key = p.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); uniq.push(p); }
+    }
+    $("count").textContent = `${uniq.length} joueur(s) unique(s).`;
+    $("warn").textContent = uniq.length > 32 ? "Tu as plus de 32 joueurs : garde seulement 32." : "";
+    return uniq.slice(0, 32);
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function makeMatches(players) {
+    const pairs = [];
+    for (let i = 0; i < players.length; i += 2) {
+      const a = players[i];
+      const b = players[i+1] ?? "BYE";
+      pairs.push({a, b, sa: "", sb: ""});
+    }
+    return pairs;
+  }
+
+  let state = {
+    players: [],
+    shuffled: [],
+    matches: []
+  };
+
+  function renderMatches() {
+    const root = $("matches");
+    root.innerHTML = "";
+    state.matches.forEach((m, idx) => {
+      const wrap = document.createElement("div");
+      wrap.style.border = "1px solid #eee";
+      wrap.style.borderRadius = "10px";
+      wrap.style.padding = "10px";
+      wrap.style.marginBottom = "10px";
+
+      wrap.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <strong>Match ${idx+1}</strong>
+          <span>${escapeHtml(m.a)} vs ${escapeHtml(m.b)}</span>
+          <span style="margin-left:auto" class="muted">Score :</span>
+          <input inputmode="numeric" pattern="[0-9]*" style="width:60px" placeholder="A" value="${m.sa}">
+          <span>-</span>
+          <input inputmode="numeric" pattern="[0-9]*" style="width:60px" placeholder="B" value="${m.sb}">
+        </div>
+      `;
+
+      const inputs = wrap.querySelectorAll("input");
+      inputs[0].addEventListener("input", e => { state.matches[idx].sa = e.target.value; });
+      inputs[1].addEventListener("input", e => { state.matches[idx].sb = e.target.value; });
+
+      root.appendChild(wrap);
+    });
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function computeTable() {
+    const players = state.shuffled.length ? state.shuffled : state.players;
+    const stats = new Map(players.map(p => [p, {p, j:0,v:0,n:0,d:0,bp:0,bc:0,pts:0}]));
+
+    function addResult(a,b,ga,gb) {
+      if (!stats.has(a) || !stats.has(b)) return;
+      const A = stats.get(a), B = stats.get(b);
+      A.j++; B.j++;
+      A.bp += ga; A.bc += gb;
+      B.bp += gb; B.bc += ga;
+
+      if (ga > gb) { A.v++; B.d++; A.pts += 3; }
+      else if (ga < gb) { B.v++; A.d++; B.pts += 3; }
+      else { A.n++; B.n++; A.pts += 1; B.pts += 1; }
+    }
+
+    for (const m of state.matches) {
+      if (m.b === "BYE") continue;
+      const sa = Number(m.sa), sb = Number(m.sb);
+      if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
+        addResult(m.a, m.b, sa, sb);
+      }
+    }
+
+    const rows = Array.from(stats.values()).map(r => ({
+      ...r,
+      diff: r.bp - r.bc
+    })).sort((x,y) =>
+      (y.pts - x.pts) || (y.diff - x.diff) || (y.bp - x.bp) || x.p.localeCompare(y.p, "fr")
+    );
+
+    const body = $("tableBody");
+    body.innerHTML = "";
+    rows.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${escapeHtml(r.p)}</td>
+        <td>${r.j}</td>
+        <td>${r.v}</td>
+        <td>${r.n}</td>
+        <td>${r.d}</td>
+        <td>${r.bp}</td>
+        <td>${r.bc}</td>
+        <td>${r.diff}</td>
+        <td><strong>${r.pts}</strong></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  $("btnLoadExample").addEventListener("click", () => {
+    $("players").value = Array.from({length: 32}, (_,i)=>`Joueur${i+1}`).join("\n");
+    state.players = parsePlayers();
+    state.shuffled = [];
+    state.matches = [];
+    $("matches").innerHTML = "";
+    computeTable();
+  });
+
+  $("btnShuffle").addEventListener("click", () => {
+    state.players = parsePlayers();
+    state.shuffled = shuffle(state.players);
+    $("players").value = state.shuffled.join("\n");
+    state.matches = [];
+    $("matches").innerHTML = "";
+    computeTable();
+  });
+
+  $("btnMakeMatches").addEventListener("click", () => {
+    state.players = parsePlayers();
+    const use = state.shuffled.length ? state.shuffled : state.players;
+    if (use.length < 2) return;
+    state.matches = makeMatches(use);
+    renderMatches();
+    computeTable();
+  });
+
+  $("btnRecalc").addEventListener("click", computeTable);
+
+  // init
+  state.players = parsePlayers();
+  computeTable();
+</script>
+</body>
+</html>
