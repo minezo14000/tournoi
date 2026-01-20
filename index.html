@@ -4,18 +4,190 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tournoi FC 26 – Gestion</title>
-  <style>
-    body{font-family:system-ui,Arial;margin:20px;max-width:1100px}
-    textarea,input,button{font-size:14px}
-    textarea{width:100%;height:140px}
-    .row{display:flex;gap:16px;flex-wrap:wrap}
-    .card{border:1px solid #ddd;border-radius:12px;padding:14px;flex:1;min-width:320px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
-    th{background:#fafafa}
-    .muted{color:#666;font-size:13px}
-    .danger{color:#b00020;font-weight:600}
-  </style>
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#0f1a2e;
+    --card2:#0c162a;
+    --text:#e8eefc;
+    --muted:#a9b7d3;
+    --line:rgba(255,255,255,.08);
+    --accent:#7c5cff;
+    --accent2:#2dd4bf;
+    --danger:#ff4d6d;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(45,212,191,.18), transparent 55%),
+      var(--bg);
+    color:var(--text);
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:24px}
+
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.2px}
+  h2{font-size:16px;margin:0 0 12px;color:var(--muted);font-weight:600}
+  p{margin:0}
+  .muted{color:var(--muted);font-size:13px;line-height:1.4}
+  .danger{color:var(--danger);font-weight:700}
+
+  /* Top header */
+  .top{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    padding:18px 18px 14px;border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+  .top .pill{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 10px;border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.03);
+    color:var(--muted);font-size:12px;
+    white-space:nowrap;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block}
+
+  /* Layout */
+  .grid{
+    display:grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap:16px;
+  }
+  @media (max-width: 980px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  /* Cards */
+  .card{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .card.soft{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));}
+  .cardHeader{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-bottom:10px;
+  }
+
+  /* Inputs */
+  textarea{
+    width:100%;
+    height:160px;
+    resize:vertical;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,.22);
+    color:var(--text);
+    padding:12px;
+    outline:none;
+  }
+  textarea:focus{border-color:rgba(124,92,255,.55); box-shadow:0 0 0 3px rgba(124,92,255,.18)}
+  input{
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,.22);
+    color:var(--text);
+    padding:10px 10px;
+    outline:none;
+  }
+  input:focus{border-color:rgba(45,212,191,.55); box-shadow:0 0 0 3px rgba(45,212,191,.16)}
+  input::placeholder, textarea::placeholder{color:rgba(169,183,211,.65)}
+
+  /* Buttons */
+  .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:650;
+    letter-spacing:.2px;
+    transition: transform .06s ease, background .15s ease, border-color .15s ease;
+  }
+  button:hover{background:rgba(255,255,255,.07)}
+  button:active{transform:translateY(1px)}
+  button.primary{
+    background:linear-gradient(135deg, rgba(124,92,255,.95), rgba(124,92,255,.65));
+    border-color:rgba(124,92,255,.55);
+  }
+  button.primary:hover{background:linear-gradient(135deg, rgba(124,92,255,1), rgba(124,92,255,.72))}
+  button.teal{
+    background:linear-gradient(135deg, rgba(45,212,191,.9), rgba(45,212,191,.55));
+    border-color:rgba(45,212,191,.55);
+    color:#07121f;
+  }
+  button.teal:hover{background:linear-gradient(135deg, rgba(45,212,191,1), rgba(45,212,191,.65))}
+  button.ghost{background:rgba(255,255,255,.03)}
+
+  /* Match list */
+  #matches > div{
+    border:1px solid var(--line) !important;
+    background:rgba(0,0,0,.18);
+    border-radius:14px !important;
+    padding:12px !important;
+  }
+  #matches strong{font-size:13px}
+  #matches span{color:var(--muted)}
+  #matches input{width:72px !important}
+
+  /* Table */
+  table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  thead th{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    padding:10px 10px;
+  }
+  tbody tr{
+    background:rgba(0,0,0,.18);
+    border:1px solid var(--line);
+  }
+  tbody td{
+    padding:12px 10px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr td:first-child{
+    border-left:1px solid var(--line);
+    border-top-left-radius:14px;
+    border-bottom-left-radius:14px;
+    color:var(--muted);
+    width:40px;
+  }
+  tbody tr td:last-child{
+    border-right:1px solid var(--line);
+    border-top-right-radius:14px;
+    border-bottom-right-radius:14px;
+  }
+
+  /* Small helpers */
+  .spacer{height:14px}
+  .metaLine{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 10px;border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,.16);
+    color:var(--muted);
+    font-size:12px;
+  }
+</style>
+
 </head>
 <body>
   <h1>Tournoi FC 26 – PS5 – Ultimate Team</h1>
