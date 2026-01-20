@@ -221,9 +221,20 @@
     </div>
 
     <div class="card">
-      <h2>2) Matchs – 1er tour</h2>
-      <div id="matches"></div>
-      <button id="btnRecalc" class="ghost">Recalculer classement</button>
+    <h2>2) Phase ligue – matchs</h2>
+
+<div class="btnRow">
+  <label class="badge" style="gap:10px">
+    Rounds
+    <input id="roundCount" inputmode="numeric" value="4" style="width:70px">
+  </label>
+
+  <button id="btnMakeLeague" class="teal">Générer phase ligue</button>
+  <button id="btnRecalc" class="ghost">Recalculer classement</button>
+</div>
+
+<div class="spacer"></div>
+<div id="matches"></div>
 
       <p class="muted">Points: victoire 3, nul 1, défaite 0 (modifiable dans le code).</p>
     </div>
@@ -267,6 +278,80 @@
   }
 
   function makeMatches(players) {
+    function buildPairsForRound(players, usedPairsSet) {
+  // Backtracking pour créer une ronde sans rematch
+  const remaining = [...players];
+
+  function key(a, b) {
+    return [a.toLowerCase(), b.toLowerCase()].sort().join("||");
+  }
+
+  function backtrack() {
+    if (remaining.length === 0) return [];
+
+    const a = remaining.shift();
+
+    // Essaie des adversaires possibles
+    for (let i = 0; i < remaining.length; i++) {
+      const b = remaining[i];
+      const k = key(a, b);
+      if (usedPairsSet.has(k)) continue;
+
+      // choisir b
+      remaining.splice(i, 1);
+
+      const rest = backtrack();
+      if (rest) {
+        return [{ a, b, sa: "", sb: "" }, ...rest];
+      }
+
+      // annuler choix b
+      remaining.splice(i, 0, b);
+    }
+
+    // remettre a et échec
+    remaining.unshift(a);
+    return null;
+  }
+
+  return backtrack();
+}
+
+function generateLeagueSchedule(players, roundCount) {
+  const usedPairs = new Set();
+  const rounds = [];
+
+  function key(a, b) {
+    return [a.toLowerCase(), b.toLowerCase()].sort().join("||");
+  }
+
+  // Pour améliorer les chances, on fait quelques tentatives avec un ordre mélangé
+  for (let attempt = 0; attempt < 60; attempt++) {
+    rounds.length = 0;
+    usedPairs.clear();
+
+    const base = shuffle(players); // ordre de départ aléatoire
+
+    let ok = true;
+    for (let r = 0; r < roundCount; r++) {
+      // On remélange légèrement à chaque round pour éviter des blocages
+      const order = shuffle(base);
+
+      const pairs = buildPairsForRound(order, usedPairs);
+      if (!pairs) { ok = false; break; }
+
+      // marquer les paires utilisées
+      for (const m of pairs) usedPairs.add(key(m.a, m.b));
+      rounds.push(pairs);
+    }
+
+    if (ok) return rounds;
+  }
+
+  // Si ça échoue (rare avec 16 joueurs / 4 rounds), on renvoie null
+  return null;
+}
+
     const pairs = [];
     for (let i = 0; i < players.length; i += 2) {
       const a = players[i];
@@ -276,40 +361,53 @@
     return pairs;
   }
 
-  let state = {
-    players: [],
-    shuffled: [],
-    matches: []
-  };
+let state = {
+  players: [],
+  shuffled: [],
+  rounds: [] // <-- phase ligue
+};
 
-  function renderMatches() {
-    const root = $("matches");
-    root.innerHTML = "";
-    state.matches.forEach((m, idx) => {
+
+ function renderMatches() {
+  const root = $("matches");
+  root.innerHTML = "";
+
+  state.rounds.forEach((round, rIndex) => {
+    const roundCard = document.createElement("div");
+    roundCard.className = "card soft";
+    roundCard.style.marginBottom = "12px";
+
+    const title = document.createElement("div");
+    title.className = "cardHeader";
+    title.innerHTML = `<h2>Round ${rIndex + 1}</h2><div class="pill">8 matchs</div>`;
+    roundCard.appendChild(title);
+
+    round.forEach((m, mIndex) => {
       const wrap = document.createElement("div");
-      wrap.style.border = "1px solid #eee";
-      wrap.style.borderRadius = "10px";
-      wrap.style.padding = "10px";
-      wrap.style.marginBottom = "10px";
 
       wrap.innerHTML = `
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <strong>Match ${idx+1}</strong>
+          <strong>Match ${mIndex + 1}</strong>
           <span>${escapeHtml(m.a)} vs ${escapeHtml(m.b)}</span>
           <span style="margin-left:auto" class="muted">Score :</span>
-          <input inputmode="numeric" pattern="[0-9]*" style="width:60px" placeholder="A" value="${m.sa}">
+          <input inputmode="numeric" pattern="[0-9]*" placeholder="A" value="${m.sa}">
           <span>-</span>
-          <input inputmode="numeric" pattern="[0-9]*" style="width:60px" placeholder="B" value="${m.sb}">
+          <input inputmode="numeric" pattern="[0-9]*" placeholder="B" value="${m.sb}">
         </div>
       `;
 
       const inputs = wrap.querySelectorAll("input");
-      inputs[0].addEventListener("input", e => { state.matches[idx].sa = e.target.value; });
-      inputs[1].addEventListener("input", e => { state.matches[idx].sb = e.target.value; });
+      inputs[0].addEventListener("input", e => { state.rounds[rIndex][mIndex].sa = e.target.value; computeTable(); });
+      inputs[1].addEventListener("input", e => { state.rounds[rIndex][mIndex].sb = e.target.value; computeTable(); });
 
-      root.appendChild(wrap);
+      root.appendChild(wrap); // <- ton CSS cible #matches > div donc c’est ok
+      roundCard.appendChild(wrap);
     });
-  }
+
+    root.appendChild(roundCard);
+  });
+}
+
 
   function escapeHtml(s){
     return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -331,13 +429,15 @@
       else { A.n++; B.n++; A.pts += 1; B.pts += 1; }
     }
 
-    for (const m of state.matches) {
-      if (m.b === "BYE") continue;
-      const sa = Number(m.sa), sb = Number(m.sb);
-      if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
-        addResult(m.a, m.b, sa, sb);
-      }
+   for (const round of state.rounds) {
+  for (const m of round) {
+    const sa = Number(m.sa), sb = Number(m.sb);
+    if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
+      addResult(m.a, m.b, sa, sb);
     }
+  }
+}
+
 
     const rows = Array.from(stats.values()).map(r => ({
       ...r,
@@ -373,14 +473,37 @@
     state.matches = [];
     $("matches").innerHTML = "";
     computeTable();
-  });
+    $("btnMakeLeague").addEventListener("click", () => {
+  state.players = parsePlayers();
+  const use = state.shuffled.length ? state.shuffled : state.players;
+
+  const roundCount = Math.max(1, Math.min(10, Number($("roundCount").value) || 4));
+
+  if (use.length !== 16) {
+    alert("Pour ce format, il faut exactement 16 joueurs.");
+    return;
+  }
+
+  const rounds = generateLeagueSchedule(use, roundCount);
+  if (!rounds) {
+    alert("Impossible de générer un planning sans doublons. Réessaie (ou baisse le nombre de rounds).");
+    return;
+  }
+
+  state.rounds = rounds;
+  renderMatches();
+  computeTable();
+});
+
 
   $("btnShuffle").addEventListener("click", () => {
     state.players = parsePlayers();
     state.shuffled = shuffle(state.players);
     $("players").value = state.shuffled.join("\n");
     state.matches = [];
-    $("matches").innerHTML = "";
+    state.rounds = [];
+$("matches").innerHTML = "";
+
     computeTable();
   });
 
