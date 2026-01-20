@@ -4,259 +4,256 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tournoi FC 26 – Gestion</title>
-<style>
-  :root{
-    --bg:#0b1220;
-    --card:#0f1a2e;
-    --card2:#0c162a;
-    --text:#e8eefc;
-    --muted:#a9b7d3;
-    --line:rgba(255,255,255,.08);
-    --accent:#7c5cff;
-    --accent2:#2dd4bf;
-    --danger:#ff4d6d;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius:18px;
-  }
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    background:
-      radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
-      radial-gradient(900px 500px at 90% 0%, rgba(45,212,191,.18), transparent 55%),
-      var(--bg);
-    color:var(--text);
-  }
+  <style>
+    :root{
+      --bg:#0b1220;
+      --text:#e8eefc;
+      --muted:#a9b7d3;
+      --line:rgba(255,255,255,.08);
+      --accent:#7c5cff;
+      --accent2:#2dd4bf;
+      --danger:#ff4d6d;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(45,212,191,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1180px;margin:0 auto;padding:24px}
+    h1{font-size:26px;margin:0 0 6px;letter-spacing:.2px}
+    h2{font-size:16px;margin:0 0 12px;color:var(--muted);font-weight:600}
+    p{margin:0}
+    .muted{color:var(--muted);font-size:13px;line-height:1.4}
+    .danger{color:var(--danger);font-weight:700}
 
-  .wrap{max-width:1180px;margin:0 auto;padding:24px}
+    .top{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+      padding:18px 18px 14px;border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+    .top .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);font-size:12px;
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block}
 
-  h1{font-size:26px;margin:0 0 6px;letter-spacing:.2px}
-  h2{font-size:16px;margin:0 0 12px;color:var(--muted);font-weight:600}
-  p{margin:0}
-  .muted{color:var(--muted);font-size:13px;line-height:1.4}
-  .danger{color:var(--danger);font-weight:700}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
 
-  /* Top header */
-  .top{
-    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
-    padding:18px 18px 14px;border:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-    border-radius:var(--radius); box-shadow:var(--shadow);
-    margin-bottom:18px;
-  }
-  .top .pill{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:8px 10px;border-radius:999px;
-    border:1px solid var(--line);
-    background:rgba(255,255,255,.03);
-    color:var(--muted);font-size:12px;
-    white-space:nowrap;
-  }
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block}
+    .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card.soft{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));}
+    .cardHeader{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-bottom:10px;
+    }
 
-  /* Layout */
-  .grid{
-    display:grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap:16px;
-  }
-  @media (max-width: 980px){
-    .grid{grid-template-columns:1fr}
-  }
+    textarea{
+      width:100%;
+      height:160px;
+      resize:vertical;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      padding:12px;
+      outline:none;
+    }
+    textarea:focus{border-color:rgba(124,92,255,.55); box-shadow:0 0 0 3px rgba(124,92,255,.18)}
+    input{
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      padding:10px 10px;
+      outline:none;
+    }
+    input:focus{border-color:rgba(45,212,191,.55); box-shadow:0 0 0 3px rgba(45,212,191,.16)}
+    input::placeholder, textarea::placeholder{color:rgba(169,183,211,.65)}
 
-  /* Cards */
-  .card{
-    border:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:16px;
-  }
-  .card.soft{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));}
-  .cardHeader{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    margin-bottom:10px;
-  }
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+    button{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:650;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+    }
+    button:hover{background:rgba(255,255,255,.07)}
+    button:active{transform:translateY(1px)}
+    button.primary{
+      background:linear-gradient(135deg, rgba(124,92,255,.95), rgba(124,92,255,.65));
+      border-color:rgba(124,92,255,.55);
+    }
+    button.primary:hover{background:linear-gradient(135deg, rgba(124,92,255,1), rgba(124,92,255,.72))}
+    button.teal{
+      background:linear-gradient(135deg, rgba(45,212,191,.9), rgba(45,212,191,.55));
+      border-color:rgba(45,212,191,.55);
+      color:#07121f;
+    }
+    button.teal:hover{background:linear-gradient(135deg, rgba(45,212,191,1), rgba(45,212,191,.65))}
+    button.ghost{background:rgba(255,255,255,.03)}
 
-  /* Inputs */
-  textarea{
-    width:100%;
-    height:160px;
-    resize:vertical;
-    border-radius:14px;
-    border:1px solid var(--line);
-    background:rgba(0,0,0,.22);
-    color:var(--text);
-    padding:12px;
-    outline:none;
-  }
-  textarea:focus{border-color:rgba(124,92,255,.55); box-shadow:0 0 0 3px rgba(124,92,255,.18)}
-  input{
-    border-radius:12px;
-    border:1px solid var(--line);
-    background:rgba(0,0,0,.22);
-    color:var(--text);
-    padding:10px 10px;
-    outline:none;
-  }
-  input:focus{border-color:rgba(45,212,191,.55); box-shadow:0 0 0 3px rgba(45,212,191,.16)}
-  input::placeholder, textarea::placeholder{color:rgba(169,183,211,.65)}
+    .spacer{height:14px}
+    .metaLine{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.16);
+      color:var(--muted);
+      font-size:12px;
+    }
 
-  /* Buttons */
-  .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  button{
-    border:1px solid var(--line);
-    background:rgba(255,255,255,.04);
-    color:var(--text);
-    padding:10px 12px;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:650;
-    letter-spacing:.2px;
-    transition: transform .06s ease, background .15s ease, border-color .15s ease;
-  }
-  button:hover{background:rgba(255,255,255,.07)}
-  button:active{transform:translateY(1px)}
-  button.primary{
-    background:linear-gradient(135deg, rgba(124,92,255,.95), rgba(124,92,255,.65));
-    border-color:rgba(124,92,255,.55);
-  }
-  button.primary:hover{background:linear-gradient(135deg, rgba(124,92,255,1), rgba(124,92,255,.72))}
-  button.teal{
-    background:linear-gradient(135deg, rgba(45,212,191,.9), rgba(45,212,191,.55));
-    border-color:rgba(45,212,191,.55);
-    color:#07121f;
-  }
-  button.teal:hover{background:linear-gradient(135deg, rgba(45,212,191,1), rgba(45,212,191,.65))}
-  button.ghost{background:rgba(255,255,255,.03)}
+    #matches > div{
+      border:1px solid var(--line) !important;
+      background:rgba(0,0,0,.18);
+      border-radius:14px !important;
+      padding:12px !important;
+      margin-bottom:10px;
+    }
+    #matches strong{font-size:13px}
+    #matches span{color:var(--muted)}
+    #matches input{width:72px !important}
 
-  /* Match list */
-  #matches > div{
-    border:1px solid var(--line) !important;
-    background:rgba(0,0,0,.18);
-    border-radius:14px !important;
-    padding:12px !important;
-  }
-  #matches strong{font-size:13px}
-  #matches span{color:var(--muted)}
-  #matches input{width:72px !important}
-
-  /* Table */
-  table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  thead th{
-    font-size:12px;
-    color:var(--muted);
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    padding:10px 10px;
-  }
-  tbody tr{
-    background:rgba(0,0,0,.18);
-    border:1px solid var(--line);
-  }
-  tbody td{
-    padding:12px 10px;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-  }
-  tbody tr td:first-child{
-    border-left:1px solid var(--line);
-    border-top-left-radius:14px;
-    border-bottom-left-radius:14px;
-    color:var(--muted);
-    width:40px;
-  }
-  tbody tr td:last-child{
-    border-right:1px solid var(--line);
-    border-top-right-radius:14px;
-    border-bottom-right-radius:14px;
-  }
-
-  /* Small helpers */
-  .spacer{height:14px}
-  .metaLine{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-  .badge{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:8px 10px;border-radius:999px;
-    border:1px solid var(--line);
-    background:rgba(0,0,0,.16);
-    color:var(--muted);
-    font-size:12px;
-  }
-</style>
-
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    thead th{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      padding:10px 10px;
+      text-align:left;
+    }
+    tbody tr{background:rgba(0,0,0,.18)}
+    tbody td{
+      padding:12px 10px;
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+    }
+    tbody tr td:first-child{
+      border-left:1px solid var(--line);
+      border-top-left-radius:14px;
+      border-bottom-left-radius:14px;
+      color:var(--muted);
+      width:40px;
+    }
+    tbody tr td:last-child{
+      border-right:1px solid var(--line);
+      border-top-right-radius:14px;
+      border-bottom-right-radius:14px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="top">
-  <div>
-    <h1>Tournoi FC 26 – PS5 – Ultimate Team</h1>
-    <p class="muted">Coller 32 pseudos, tirage au sort, saisir les scores, classement automatique.</p>
-    <div class="metaLine">
-      <span class="badge"><span class="dot"></span> Live ready</span>
-      <span class="badge">32 joueurs max</span>
-      <span class="badge">Déco = défaite</span>
-      <span class="badge">Micro OFF</span>
-    </div>
-  </div>
-  <div class="pill">GitHub Pages</div>
-</div>
-
-
-<div class="grid">
-<div class="card">
-      <h2>1) Joueurs (32 max)</h2>
-      <textarea id="players" placeholder="Un pseudo par ligne (32 max)"></textarea>
-      <div class="btnRow">
-<button id="btnLoadExample" class="ghost">Charger exemple</button>
-<button id="btnShuffle" class="primary">Tirage au sort</button>
-<button id="btnMakeMatches" class="teal">Créer matchs (1er tour)</button>
-
-    
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Tournoi FC 26 – Gestion</h1>
+        <p class="muted">PS5 • Ultimate Team • Tirage • Knockout ou Phase ligue (sans rematch) • Classement live</p>
+        <div class="metaLine">
+          <span class="badge"><span class="dot"></span> Live ready</span>
+          <span class="badge">Déco = défaite</span>
+          <span class="badge">Micro OFF</span>
+        </div>
       </div>
-      <p id="count" class="muted"></p>
-      <p id="warn" class="danger"></p>
+      <div class="pill">GitHub Pages</div>
     </div>
 
-    <div class="card">
-    <h2>2) Phase ligue – matchs</h2>
+    <div class="grid">
+      <div class="card">
+        <h2>1) Joueurs (32 max)</h2>
+        <textarea id="players" placeholder="Un pseudo par ligne (32 max)"></textarea>
 
-<div class="btnRow">
-  <label class="badge" style="gap:10px">
-    Rounds
-    <input id="roundCount" inputmode="numeric" value="4" style="width:70px">
-  </label>
+        <div class="btnRow">
+          <button id="btnLoadExample" class="ghost">Charger exemple</button>
+          <button id="btnShuffle" class="primary">Tirage au sort</button>
+          <button id="btnMakeMatches" class="teal">Créer matchs (knockout)</button>
+        </div>
 
-  <button id="btnMakeLeague" class="teal">Générer phase ligue</button>
-  <button id="btnRecalc" class="ghost">Recalculer classement</button>
-</div>
+        <div class="spacer"></div>
+        <p id="count" class="muted"></p>
+        <p id="warn" class="danger"></p>
+        <p class="muted" style="margin-top:10px">
+          Phase ligue : il faut exactement <strong>16 joueurs</strong>. Knockout : jusqu’à 32 joueurs.
+        </p>
+      </div>
 
-<div class="spacer"></div>
-<div id="matches"></div>
+      <div class="card">
+        <h2>2) Matchs</h2>
 
-      <p class="muted">Points: victoire 3, nul 1, défaite 0 (modifiable dans le code).</p>
+        <div class="btnRow">
+          <label class="badge" style="gap:10px">
+            Rounds (ligue)
+            <input id="roundCount" inputmode="numeric" value="4" style="width:70px">
+          </label>
+
+          <button id="btnMakeLeague" class="teal">Générer phase ligue (sans rematch)</button>
+          <button id="btnRecalc" class="ghost">Recalculer classement</button>
+        </div>
+
+        <div class="spacer"></div>
+        <div id="matches"></div>
+
+        <p class="muted">Points : victoire 3, nul 1, défaite 0.</p>
+      </div>
     </div>
-  </div>
 
-  <div class="card" style="margin-top:16px">
-    <h2>3) Classement (live)</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th><th>Joueur</th><th>J</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+    <div class="card" style="margin-top:16px">
+      <h2>3) Classement (live)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Joueur</th><th>J</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
   </div>
 
 <script>
   const $ = (id) => document.getElementById(id);
 
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   function parsePlayers() {
-    const lines = $("players").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const el = $("players");
+    if (!el) return [];
+    const lines = el.value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
     const uniq = [];
     const seen = new Set();
     for (const p of lines) {
@@ -277,81 +274,8 @@
     return a;
   }
 
+  // Knockout (1er tour)
   function makeMatches(players) {
-    function buildPairsForRound(players, usedPairsSet) {
-  // Backtracking pour créer une ronde sans rematch
-  const remaining = [...players];
-
-  function key(a, b) {
-    return [a.toLowerCase(), b.toLowerCase()].sort().join("||");
-  }
-
-  function backtrack() {
-    if (remaining.length === 0) return [];
-
-    const a = remaining.shift();
-
-    // Essaie des adversaires possibles
-    for (let i = 0; i < remaining.length; i++) {
-      const b = remaining[i];
-      const k = key(a, b);
-      if (usedPairsSet.has(k)) continue;
-
-      // choisir b
-      remaining.splice(i, 1);
-
-      const rest = backtrack();
-      if (rest) {
-        return [{ a, b, sa: "", sb: "" }, ...rest];
-      }
-
-      // annuler choix b
-      remaining.splice(i, 0, b);
-    }
-
-    // remettre a et échec
-    remaining.unshift(a);
-    return null;
-  }
-
-  return backtrack();
-}
-
-function generateLeagueSchedule(players, roundCount) {
-  const usedPairs = new Set();
-  const rounds = [];
-
-  function key(a, b) {
-    return [a.toLowerCase(), b.toLowerCase()].sort().join("||");
-  }
-
-  // Pour améliorer les chances, on fait quelques tentatives avec un ordre mélangé
-  for (let attempt = 0; attempt < 60; attempt++) {
-    rounds.length = 0;
-    usedPairs.clear();
-
-    const base = shuffle(players); // ordre de départ aléatoire
-
-    let ok = true;
-    for (let r = 0; r < roundCount; r++) {
-      // On remélange légèrement à chaque round pour éviter des blocages
-      const order = shuffle(base);
-
-      const pairs = buildPairsForRound(order, usedPairs);
-      if (!pairs) { ok = false; break; }
-
-      // marquer les paires utilisées
-      for (const m of pairs) usedPairs.add(key(m.a, m.b));
-      rounds.push(pairs);
-    }
-
-    if (ok) return rounds;
-  }
-
-  // Si ça échoue (rare avec 16 joueurs / 4 rounds), on renvoie null
-  return null;
-}
-
     const pairs = [];
     for (let i = 0; i < players.length; i += 2) {
       const a = players[i];
@@ -361,33 +285,111 @@ function generateLeagueSchedule(players, roundCount) {
     return pairs;
   }
 
-let state = {
-  players: [],
-  shuffled: [],
-  rounds: [] // <-- phase ligue
-};
+  // ---- Phase ligue sans rematch (backtracking) ----
+  function pairKey(a, b) {
+    return [a.toLowerCase(), b.toLowerCase()].sort().join("||");
+  }
 
+  function buildPairsForRound(players, usedPairsSet) {
+    const remaining = [...players];
 
- function renderMatches() {
-  const root = $("matches");
-  root.innerHTML = "";
+    function backtrack() {
+      if (remaining.length === 0) return [];
+      const a = remaining.shift();
 
-  state.rounds.forEach((round, rIndex) => {
-    const roundCard = document.createElement("div");
-    roundCard.className = "card soft";
-    roundCard.style.marginBottom = "12px";
+      for (let i = 0; i < remaining.length; i++) {
+        const b = remaining[i];
+        const k = pairKey(a, b);
+        if (usedPairsSet.has(k)) continue;
 
-    const title = document.createElement("div");
-    title.className = "cardHeader";
-    title.innerHTML = `<h2>Round ${rIndex + 1}</h2><div class="pill">8 matchs</div>`;
-    roundCard.appendChild(title);
+        remaining.splice(i, 1);
+        const rest = backtrack();
+        if (rest) return [{ a, b, sa: "", sb: "" }, ...rest];
+        remaining.splice(i, 0, b);
+      }
+      remaining.unshift(a);
+      return null;
+    }
 
-    round.forEach((m, mIndex) => {
+    return backtrack();
+  }
+
+  function generateLeagueSchedule(players, roundCount) {
+    const usedPairs = new Set();
+    const rounds = [];
+
+    for (let attempt = 0; attempt < 80; attempt++) {
+      rounds.length = 0;
+      usedPairs.clear();
+
+      const base = shuffle(players);
+
+      let ok = true;
+      for (let r = 0; r < roundCount; r++) {
+        const order = shuffle(base);
+        const pairs = buildPairsForRound(order, usedPairs);
+        if (!pairs) { ok = false; break; }
+        for (const m of pairs) usedPairs.add(pairKey(m.a, m.b));
+        rounds.push(pairs);
+      }
+      if (ok) return rounds;
+    }
+    return null;
+  }
+
+  // ---- State ----
+  let state = {
+    players: [],
+    shuffled: [],
+    matches: [], // knockout
+    rounds: []   // ligue
+  };
+
+  // ---- Render ----
+  function renderMatches() {
+    const root = $("matches");
+    root.innerHTML = "";
+
+    // Mode ligue
+    if (state.rounds.length > 0) {
+      state.rounds.forEach((round, rIndex) => {
+        const roundCard = document.createElement("div");
+        roundCard.className = "card soft";
+
+        const title = document.createElement("div");
+        title.className = "cardHeader";
+        title.innerHTML = `<h2>Round ${rIndex + 1}</h2><div class="pill">${round.length} matchs</div>`;
+        roundCard.appendChild(title);
+
+        round.forEach((m, mIndex) => {
+          const wrap = document.createElement("div");
+          wrap.innerHTML = `
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <strong>Match ${mIndex + 1}</strong>
+              <span>${escapeHtml(m.a)} vs ${escapeHtml(m.b)}</span>
+              <span style="margin-left:auto" class="muted">Score :</span>
+              <input inputmode="numeric" pattern="[0-9]*" placeholder="A" value="${m.sa}">
+              <span>-</span>
+              <input inputmode="numeric" pattern="[0-9]*" placeholder="B" value="${m.sb}">
+            </div>
+          `;
+          const inputs = wrap.querySelectorAll("input");
+          inputs[0].addEventListener("input", e => { state.rounds[rIndex][mIndex].sa = e.target.value; computeTable(); });
+          inputs[1].addEventListener("input", e => { state.rounds[rIndex][mIndex].sb = e.target.value; computeTable(); });
+          roundCard.appendChild(wrap);
+        });
+
+        root.appendChild(roundCard);
+      });
+      return;
+    }
+
+    // Mode knockout
+    state.matches.forEach((m, idx) => {
       const wrap = document.createElement("div");
-
       wrap.innerHTML = `
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <strong>Match ${mIndex + 1}</strong>
+          <strong>Match ${idx+1}</strong>
           <span>${escapeHtml(m.a)} vs ${escapeHtml(m.b)}</span>
           <span style="margin-left:auto" class="muted">Score :</span>
           <input inputmode="numeric" pattern="[0-9]*" placeholder="A" value="${m.sa}">
@@ -395,22 +397,11 @@ let state = {
           <input inputmode="numeric" pattern="[0-9]*" placeholder="B" value="${m.sb}">
         </div>
       `;
-
       const inputs = wrap.querySelectorAll("input");
-      inputs[0].addEventListener("input", e => { state.rounds[rIndex][mIndex].sa = e.target.value; computeTable(); });
-      inputs[1].addEventListener("input", e => { state.rounds[rIndex][mIndex].sb = e.target.value; computeTable(); });
-
-      root.appendChild(wrap); // <- ton CSS cible #matches > div donc c’est ok
-      roundCard.appendChild(wrap);
+      inputs[0].addEventListener("input", e => { state.matches[idx].sa = e.target.value; computeTable(); });
+      inputs[1].addEventListener("input", e => { state.matches[idx].sb = e.target.value; computeTable(); });
+      root.appendChild(wrap);
     });
-
-    root.appendChild(roundCard);
-  });
-}
-
-
-  function escapeHtml(s){
-    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function computeTable() {
@@ -429,22 +420,27 @@ let state = {
       else { A.n++; B.n++; A.pts += 1; B.pts += 1; }
     }
 
-   for (const round of state.rounds) {
-  for (const m of round) {
-    const sa = Number(m.sa), sb = Number(m.sb);
-    if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
-      addResult(m.a, m.b, sa, sb);
+    if (state.rounds.length > 0) {
+      for (const round of state.rounds) {
+        for (const m of round) {
+          const sa = Number(m.sa), sb = Number(m.sb);
+          if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
+            addResult(m.a, m.b, sa, sb);
+          }
+        }
+      }
+    } else {
+      for (const m of state.matches) {
+        if (m.b === "BYE") continue;
+        const sa = Number(m.sa), sb = Number(m.sb);
+        if (Number.isFinite(sa) && Number.isFinite(sb) && m.sa !== "" && m.sb !== "") {
+          addResult(m.a, m.b, sa, sb);
+        }
+      }
     }
-  }
-}
 
-
-    const rows = Array.from(stats.values()).map(r => ({
-      ...r,
-      diff: r.bp - r.bc
-    })).sort((x,y) =>
-      (y.pts - x.pts) || (y.diff - x.diff) || (y.bp - x.bp) || x.p.localeCompare(y.p, "fr")
-    );
+    const rows = Array.from(stats.values()).map(r => ({...r, diff: r.bp - r.bc}))
+      .sort((x,y) => (y.pts - x.pts) || (y.diff - x.diff) || (y.bp - x.bp) || x.p.localeCompare(y.p, "fr"));
 
     const body = $("tableBody");
     body.innerHTML = "";
@@ -466,64 +462,66 @@ let state = {
     });
   }
 
-  $("btnLoadExample").addEventListener("click", () => {
+  // ---- Buttons ----
+  $("btnLoadExample")?.addEventListener("click", () => {
     $("players").value = Array.from({length: 32}, (_,i)=>`Joueur${i+1}`).join("\n");
     state.players = parsePlayers();
     state.shuffled = [];
     state.matches = [];
+    state.rounds = [];
     $("matches").innerHTML = "";
     computeTable();
-    $("btnMakeLeague").addEventListener("click", () => {
-  state.players = parsePlayers();
-  const use = state.shuffled.length ? state.shuffled : state.players;
+  });
 
-  const roundCount = Math.max(1, Math.min(10, Number($("roundCount").value) || 4));
-
-  if (use.length !== 16) {
-    alert("Pour ce format, il faut exactement 16 joueurs.");
-    return;
-  }
-
-  const rounds = generateLeagueSchedule(use, roundCount);
-  if (!rounds) {
-    alert("Impossible de générer un planning sans doublons. Réessaie (ou baisse le nombre de rounds).");
-    return;
-  }
-
-  state.rounds = rounds;
-  renderMatches();
-  computeTable();
-});
-
-
-  $("btnShuffle").addEventListener("click", () => {
+  $("btnShuffle")?.addEventListener("click", () => {
     state.players = parsePlayers();
     state.shuffled = shuffle(state.players);
     $("players").value = state.shuffled.join("\n");
     state.matches = [];
     state.rounds = [];
-$("matches").innerHTML = "";
-
+    $("matches").innerHTML = "";
     computeTable();
   });
 
-  $("btnMakeMatches").addEventListener("click", () => {
+  $("btnMakeMatches")?.addEventListener("click", () => {
     state.players = parsePlayers();
     const use = state.shuffled.length ? state.shuffled : state.players;
     if (use.length < 2) return;
+
+    state.rounds = [];
     state.matches = makeMatches(use);
     renderMatches();
     computeTable();
   });
 
-  $("btnRecalc").addEventListener("click", computeTable);
+  $("btnMakeLeague")?.addEventListener("click", () => {
+    state.players = parsePlayers();
+    const use = state.shuffled.length ? state.shuffled : state.players;
+
+    const roundCount = Math.max(1, Math.min(10, Number($("roundCount")?.value) || 4));
+
+    if (use.length !== 16) {
+      alert("Pour la phase ligue sans rematch, il faut exactement 16 joueurs.");
+      return;
+    }
+
+    const rounds = generateLeagueSchedule(use, roundCount);
+    if (!rounds) {
+      alert("Impossible de générer un planning sans doublons. Réessaie ou baisse le nombre de rounds.");
+      return;
+    }
+
+    state.matches = [];
+    state.rounds = rounds;
+    renderMatches();
+    computeTable();
+  });
+
+  $("btnRecalc")?.addEventListener("click", computeTable);
 
   // init
   state.players = parsePlayers();
   computeTable();
 </script>
-  </div>
 </body>
-  <div class="wrap">
-
 </html>
